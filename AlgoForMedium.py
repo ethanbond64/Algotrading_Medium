@@ -25,6 +25,16 @@ funding = initInvestment
 # 'BCH-USD' = Bitcoin Cash, 'BTC-USD' = Bitcoin, 'ETH-USD' = Ether
 currency = 'BCH-USD'
 
+# Will return the ID of your specific currency account
+def getSpecificAccount(cur):
+    x = auth_client.get_accounts()
+    for account in x:
+        if account['currency'] == cur:
+            return account['id']
+
+# Get the currency's specific ID
+specificID = getSpecificAccount(currency[:3])
+
 # Granularity (in seconds). So 300 = data from every 5 min
 period = 300
 
@@ -88,13 +98,12 @@ while True:
     # The maximum amount of Cryptocurrency that can be purchased with your funds
     possiblePurchase = (float(funding)) / float(currentPrice)
 
-    # The amount of X Owned. You must find your specifc account number
-    # for the specific currency and replace 'xxxxx' with it
-    owned = float(auth_client.get_account('xxxxx')['available'])
+    # The amount of currency owned
+    owned = float(auth_client.get_account(specificID)['available'])
 
     # The value of the cryptourrency in USD
     possibleIncome = float(currentPrice) * owned
-    
+
 ################################################################################
                              ###Decision Making###
 
