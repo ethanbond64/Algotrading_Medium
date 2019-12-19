@@ -81,6 +81,7 @@ while True:
         ROCSUM[ii] = ( ROC11[ii] + ROC14[ii] )
 
     # Calculate the past 4 Coppock values with Weighted Moving Average
+    coppock = np.zeros(4)
     for ll in range(0,4):
         coppock[ll] = (((1*ROCSUM[ll+9]) + (2*ROCSUM[ll+8]) + (3*ROCSUM[ll+7]) \
         + (4*ROCSUM[ll+6]) + (5*ROCSUM[ll+5]) + (6*ROCSUM[ll+4]) \
