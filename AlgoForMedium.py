@@ -77,7 +77,7 @@ while True:
 
     for ii in range(0,13):
         ROC11[ii] = (100*(price[ii]-price[ii+11]) / float(price[ii+11]))
-        ROC14[ii] = (100*(price[ii]price[ii+14]) / float(price[ii+14]))
+        ROC14[ii] = (100*(price[ii]-price[ii+14]) / float(price[ii+14]))
         ROCSUM[ii] = ( ROC11[ii] + ROC14[ii] )
 
     # Calculate the past 4 Coppock values with Weighted Moving Average
