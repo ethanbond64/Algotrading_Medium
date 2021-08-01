@@ -5,15 +5,11 @@ import time
 
 public_client = cbpro.PublicClient()
 
-
-
 public = ""
 private = ""
 secret = ""
 
 auth_client = cbpro.AuthenticatedClient(public,private,secret)
-
-                        ### Investment Details ###
 
 # Amount to initially invest
 initInvestment = 100
@@ -89,7 +85,7 @@ def BuySell(buy, coppockD1, currency, funds, currentPrice, possibleIncome, initI
     if buy == True and (coppockD1[0] / abs(coppockD1[0])) == 1 and (coppockD1[1] / abs(coppockD1[1])) == -1:
 
         # Place the order
-        auth_client.place_market_order(product_id=currency, side='buy', funds=str(funding))
+        auth_client.place_market_order(product_id=currency, side='buy', funds=str(funds))
 
         # Print message in the terminal for reference
         message = "Buying Approximately " + str(possiblePurchase) + " " + currency + "  Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(funds)
@@ -289,4 +285,3 @@ while True:
     # I couldn't make the break function stay in the BuySell function, so it goes here.
     if sellstop == True:
         break
-
