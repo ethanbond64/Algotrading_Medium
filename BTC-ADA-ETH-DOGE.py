@@ -48,8 +48,11 @@ period = 300
 # We will keep track of how many iterations our bot has done
 iteration = 1
 
-# Start off by looking to buy
+# Start off by looking to buy (you need to set each buy to true for each cryptocurrency)
 buy = True
+buy1 = True
+buy2 = True
+buy3 = True
 sellstop = False
 
 # Calculates the Curve for the currencies
@@ -79,7 +82,11 @@ def CoppockFormula(price):
 
 # BuySell function buys and sells the crypto using the CoppockFormula above
 def BuySell(buy, coppockD1, currency, funds, currentPrice, possibleIncome, initInvestment, owned, fundingvar):
+    # The maximum amount of Cryptocurrency that can be purchased with your funds.
+    # The function BuySell has a variable so you could have an unlimited amount of currencies listed
+    # as long as you make sure they are assigned to a variable
     possiblePurchase = (float(fundingvar)) / float(currentPrice)
+
     print(coppockD1[0] / abs(coppockD1[0]))
     print(coppockD1[1] / abs(coppockD1[1]))
     if buy == True and (coppockD1[0] / abs(coppockD1[0])) == 1 and (coppockD1[1] / abs(coppockD1[1])) == -1:
@@ -93,7 +100,7 @@ def BuySell(buy, coppockD1, currency, funds, currentPrice, possibleIncome, initI
 
         # Update funding level and Buy variable
         fundingvar = 0
-        buy = False
+        buy_def = False
 
     print(coppockD1[0]/abs(coppockD1[0]))
     print(coppockD1[1]/abs(coppockD1[1]))
@@ -110,7 +117,7 @@ def BuySell(buy, coppockD1, currency, funds, currentPrice, possibleIncome, initI
 
         # Update funding level and Buy variable
         fundingvar = int(possibleIncome)
-        buy = True
+        buy_def = True
 
     # Stop loss: sell everything and stop trading if your value is less than 80% of initial investment
     if (possibleIncome+funding) <= 0.8 * initInvestment:
@@ -133,7 +140,7 @@ def stats(currentPrice, funds, owned, currency, coppockres):
 
 # Main Loop
 while True:
-    # 4 loops for each variable
+    # 4 loops for each currency
     try:
         historicData = auth_client.get_product_historic_rates(currency, granularity=period)
 
@@ -168,6 +175,7 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
+    time.sleep(1)
     try:
         historicData2 = auth_client.get_product_historic_rates(currency2, granularity=period)
 
@@ -205,7 +213,7 @@ while True:
     time.sleep(1)
 
 
-    # The maximum amount of Cryptocurrency that can be purchased with your funds
+    
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("ids for currencies")
     print(specificID)
@@ -240,14 +248,16 @@ while True:
     print(coppockres)
     BuySell(buy, coppockres, currency, funding, currentPrice, possibleIncome, funding, owned, funding)
     funding = BuySell.variable
+    buy = buy_def
 
     CoppockFormula(price1)
     coppockres = CoppockFormula.variable
     print(currency1)
     print(coppockres)
     statscoppock1 = coppockres
-    BuySell(buy, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1, funding1)
+    BuySell(buy1, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1, funding1)
     funding1 = BuySell.variable
+    buy1 = buy_def
 
 
     CoppockFormula(price2)
@@ -255,16 +265,18 @@ while True:
     print(currency2)
     print(coppockres)
     statscoppock2 = coppockres
-    BuySell(buy, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2, funding2)
+    BuySell(buy2, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2, funding2)
     funding2 = BuySell.variable
+    buy2 = buy_def
 
     CoppockFormula(price3)
     coppockres = CoppockFormula.variable
     statscoppock3 = coppockres
     print(currency3)
     print(coppockres)
-    BuySell(buy, coppockres, currency3, funding3, currentPrice3, possibleIncome3, funding3, owned3, funding2)
+    BuySell(buy3, coppockres, currency3, funding3, currentPrice3, possibleIncome3, funding3, owned3, funding2)
     funding3 = BuySell.variable
+    buy3 = buy_def
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     time.sleep(4)
 
