@@ -43,7 +43,7 @@ specificID2 = getSpecificAccount(str('ETH'))
 specificID3 = getSpecificAccount(str('ADA'))
 
 # Granularity (in seconds). So 300 = data from every 5 min (its a stickler about the seconds tho)
-period = 60
+period = 300
 
 # We will keep track of how many iterations our bot has done
 iteration = 1
@@ -126,8 +126,8 @@ def BuySell(buy, coppockD1, currency, funds, currentPrice, possibleIncome, initI
 
 #  misc statistics for better readability
 def stats(currentPrice, funds, owned, currency, coppockres):
-    print("Current Price: ", currentPrice)
-    print("Your Funds: ", funds)
+    print("Current Price: $" + str(currentPrice))
+    print("Your Funds: $" + str(funds))
     print("You Own: ", owned, currency)
     print("coppock data: ", coppockres)
 
@@ -141,7 +141,7 @@ while True:
         price = np.squeeze(np.asarray(np.matrix(historicData)[:,4]))
         
         # Wait for 1 second, to avoid API limit
-        time.sleep(1)
+        #time.sleep(1)
 
         # Get latest data and show to the user for reference
         newData = auth_client.get_product_ticker(product_id=currency)
@@ -158,7 +158,7 @@ while True:
         price1 = np.squeeze(np.asarray(np.matrix(historicData1)[:,4]))
         
         # Wait for 1 second, to avoid API limit
-        time.sleep(1)
+        #time.sleep(1)
 
         # Get latest data and show to the user for reference
         newData1 = auth_client.get_product_ticker(product_id=currency1)
@@ -175,7 +175,7 @@ while True:
         price2 = np.squeeze(np.asarray(np.matrix(historicData2)[:,4]))
         
         # Wait for 1 second, to avoid API limit
-        time.sleep(1)
+        #time.sleep(1)
 
         # Get latest data and show to the user for reference
         newData2 = auth_client.get_product_ticker(product_id=currency2)
@@ -192,7 +192,7 @@ while True:
         price3 = np.squeeze(np.asarray(np.matrix(historicData3)[:,4]))
         
         # Wait for 1 second, to avoid API limit
-        time.sleep(1)
+        #time.sleep(1)
 
         # Get latest data and show to the user for reference
         newData3 = auth_client.get_product_ticker(product_id=currency3)
@@ -202,10 +202,8 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
+    time.sleep(1)
 
-    # Calculate the rate of change 11 and 14 units back, then sum them
-    CoppockFormula(price)
-    coppockres = CoppockFormula.variable
 
     # The maximum amount of Cryptocurrency that can be purchased with your funds
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
@@ -233,16 +231,20 @@ while True:
     # This is where all the functions do all the math
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("Coppock function / BuySell stats")
+
+    # Calculate the rate of change 11 and 14 units back, then sum them
+    CoppockFormula(price)
+    coppockres = CoppockFormula.variable
     statscoppock = coppockres
-    print(coppockres)
     print(currency)
+    print(coppockres)
     BuySell(buy, coppockres, currency, funding, currentPrice, possibleIncome, funding, owned, funding)
     funding = BuySell.variable
 
     CoppockFormula(price1)
     coppockres = CoppockFormula.variable
-    print(coppockres)
     print(currency1)
+    print(coppockres)
     statscoppock1 = coppockres
     BuySell(buy, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1, funding1)
     funding1 = BuySell.variable
@@ -250,8 +252,8 @@ while True:
 
     CoppockFormula(price2)
     coppockres = CoppockFormula.variable
-    print(coppockres)
     print(currency2)
+    print(coppockres)
     statscoppock2 = coppockres
     BuySell(buy, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2, funding2)
     funding2 = BuySell.variable
@@ -259,8 +261,8 @@ while True:
     CoppockFormula(price3)
     coppockres = CoppockFormula.variable
     statscoppock3 = coppockres
-    print(coppockres)
     print(currency3)
+    print(coppockres)
     BuySell(buy, coppockres, currency3, funding3, currentPrice3, possibleIncome3, funding3, owned3, funding2)
     funding3 = BuySell.variable
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
@@ -278,7 +280,7 @@ while True:
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     stats(currentPrice3, funding3, owned3, currency3, statscoppock3)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-
+    print('total : $' + str(initInvestment))
     # Wait for however long the period variable is before repeating
     time.sleep(period)
     iteration += 1
