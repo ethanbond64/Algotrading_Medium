@@ -296,6 +296,7 @@ while True:
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     stats(currentPrice3, funding3, owned3, currency3, statscoppock3)
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    # Could make this a table and have an unlimited amout of variables to calculate :)
     print('Total invested : $' + str(abs(int(funding + funding1 + funding2 + funding3) - int(initInvestment))))
     # Wait for however long the period variable is before repeating
     time.sleep(period)
