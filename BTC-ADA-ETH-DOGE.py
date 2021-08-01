@@ -264,7 +264,7 @@ while True:
     coppockres = CoppockFormula.variable
     statscoppock3 = coppockres
     print(coppockres)
-    print(currency3, "\n")
+    print(currency3)
     BuySell(buy, coppockres, currency3, funding3, currentPrice3, possibleIncome3, funding3, owned3, funding2)
     funding3 = BuySell.variable
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
