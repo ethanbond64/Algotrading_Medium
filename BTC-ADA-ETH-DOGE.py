@@ -16,7 +16,7 @@ auth_client = cbpro.AuthenticatedClient(public,private,secret)
                         ### Investment Details ###
 
 # Amount to initially invest
-initInvestment = 0
+initInvestment = 100
 
 # Amount that will be used for purchase starts at the initial amount
 funding = float(initInvestment*0.4)
@@ -40,7 +40,7 @@ def getSpecificAccount(cur):
             return account['id']
 
 # Get the currency's specific ID
-
+# You have to type in the specific currency you want eg. 'DOGE' = DOGE-USD, 'BTC' = BTC-USD, etc
 specificID = getSpecificAccount(str('DOGE'))
 specificID1 = getSpecificAccount(str('BTC'))
 specificID2 = getSpecificAccount(str('ETH'))
@@ -56,6 +56,7 @@ iteration = 1
 buy = True
 sellstop = False
 
+# Calculates the Curve for the currencies
 def CoppockFormula(price):
     ROC11 = np.zeros(13)
     ROC14 = np.zeros(13)
@@ -80,7 +81,9 @@ def CoppockFormula(price):
         coppockD1[mm] = coppock[mm] - coppock[mm+1]
     CoppockFormula.variable = coppockD1
 
-def BuySell(buy, coppockD1, currency, funding, currentPrice, possibleIncome, initInvestment, owned):
+# BuySell function buys and sells the crypto using the CoppockFormula above
+def BuySell(buy, coppockD1, currency, funds, currentPrice, possibleIncome, initInvestment, owned, fundingvar):
+    possiblePurchase = (float(fundingvar)) / float(currentPrice)
     print(coppockD1[0] / abs(coppockD1[0]))
     print(coppockD1[1] / abs(coppockD1[1]))
     if buy == True and (coppockD1[0] / abs(coppockD1[0])) == 1 and (coppockD1[1] / abs(coppockD1[1])) == -1:
@@ -89,12 +92,11 @@ def BuySell(buy, coppockD1, currency, funding, currentPrice, possibleIncome, ini
         auth_client.place_market_order(product_id=currency, side='buy', funds=str(funding))
 
         # Print message in the terminal for reference
-        message = "Buying Approximately " + str(possiblePurchase) + " " + \
-        currency + "  Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(funding)
+        message = "Buying Approximately " + str(possiblePurchase) + " " + currency + "  Now @ " + str(currentPrice) + "/Coin. TOTAL = " + str(funds)
         print(message)
 
         # Update funding level and Buy variable
-        funding = 0
+        fundingvar = 0
         buy = False
 
     print(coppockD1[0]/abs(coppockD1[0]))
@@ -111,7 +113,7 @@ def BuySell(buy, coppockD1, currency, funding, currentPrice, possibleIncome, ini
         print(message)
 
         # Update funding level and Buy variable
-        funding = int(possibleIncome)
+        fundingvar = int(possibleIncome)
         buy = True
 
     # Stop loss: sell everything and stop trading if your value is less than 80% of initial investment
@@ -124,15 +126,18 @@ def BuySell(buy, coppockD1, currency, funding, currentPrice, possibleIncome, ini
             time.sleep(1)
         # Will break out of the while loop and the program will end
         sellstop = True
+    BuySell.variable = fundingvar
 
-def stats(currentPrice, funding, owned, currency, coppockres):
+#  misc statistics for better readability
+def stats(currentPrice, funds, owned, currency, coppockres):
     print("Current Price: ", currentPrice)
-    print("Your Funds: ", funding)
+    print("Your Funds: ", funds)
     print("You Own: ", owned, currency)
     print("coppock data: ", coppockres)
 
-
+# Main Loop
 while True:
+    # 4 loops for each variable
     try:
         historicData = auth_client.get_product_historic_rates(currency, granularity=period)
 
@@ -150,7 +155,6 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
-    
     try:
         historicData1 = auth_client.get_product_historic_rates(currency1, granularity=period)
 
@@ -168,7 +172,6 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
-
     try:
         historicData2 = auth_client.get_product_historic_rates(currency2, granularity=period)
 
@@ -186,8 +189,6 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
-
-
     try:
         historicData3 = auth_client.get_product_historic_rates(currency3, granularity=period)
 
@@ -211,11 +212,6 @@ while True:
     coppockres = CoppockFormula.variable
 
     # The maximum amount of Cryptocurrency that can be purchased with your funds
-    possiblePurchase = (float(funding)) / float(currentPrice)
-    possiblePurchase1 = (float(funding1)) / float(currentPrice1)
-    possiblePurchase2 = (float(funding2)) / float(currentPrice2)
-    possiblePurchase3 = (float(funding3)) / float(currentPrice3)
-
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("ids for currencies")
     print(specificID)
@@ -238,21 +234,22 @@ while True:
     possibleIncome2 = (float(currentPrice2) * owned2)
     possibleIncome3 = (float(currentPrice3) * owned3)
 
-    # Buy Conditions: latest derivative is + and previous is -
+    # This is where all the functions do all the math
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    print("Coppock/BuySell stats")
+    print("Coppock function / BuySell stats")
     statscoppock = coppockres
     print(coppockres)
     print(currency)
-    BuySell(buy, coppockres, currency, funding, currentPrice, possibleIncome, funding, owned)
+    BuySell(buy, coppockres, currency, funding, currentPrice, possibleIncome, funding, owned, funding)
+    funding = BuySell.variable
 
     CoppockFormula(price1)
     coppockres = CoppockFormula.variable
     print(coppockres)
     print(currency1)
     statscoppock1 = coppockres
-    BuySell(buy, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1)
-
+    BuySell(buy, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1, funding1)
+    funding1 = BuySell.variable
 
 
     CoppockFormula(price2)
@@ -260,21 +257,20 @@ while True:
     print(coppockres)
     print(currency2)
     statscoppock2 = coppockres
-    BuySell(buy, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2)
-
+    BuySell(buy, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2, funding2)
+    funding2 = BuySell.variable
 
     CoppockFormula(price3)
     coppockres = CoppockFormula.variable
     statscoppock3 = coppockres
     print(coppockres)
     print(currency3, "\n")
+    BuySell(buy, coppockres, currency3, funding3, currentPrice3, possibleIncome3, funding3, owned3, funding2)
+    funding3 = BuySell.variable
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     time.sleep(4)
-    BuySell(buy, coppockres, currency3, funding3, currentPrice3, possibleIncome3, funding3, owned3)
-
-
 
     # Printing here to make the details easier to read in the terminal
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("iteration number", iteration)
 
     # Print the details for reference
@@ -288,7 +284,9 @@ while True:
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
     # Wait for however long the period variable is before repeating
-    time.sleep(60)
+    time.sleep(period)
     iteration += 1
+    # I couldn't make the break function stay in the BuySell function, so it goes here.
     if sellstop == True:
         break
+

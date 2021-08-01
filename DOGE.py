@@ -150,5 +150,5 @@ while True:
     print("You Own ", owned, currency)
 
     # Wait for however long the period variable is before repeating
-    time.sleep(300)
+    time.sleep(period)
     iteration += 1
