@@ -43,14 +43,14 @@ specificID2 = getSpecificAccount(str('ETH'))
 specificID3 = getSpecificAccount(str('ADA'))
 
 # Granularity (in seconds). So 300 = data from every 5 min (its a stickler about the seconds tho)
-period = 60
+period = 7200
 
 # We will keep track of how many iterations our bot has done
 iteration = 1
 
 # Start off by looking to buy (you need to set each buy to true for each cryptocurrency)
-buy = True
-buy1 = True
+buy = False
+buy1 = False
 buy2 = True
 buy3 = True
 sellstop = False
@@ -106,9 +106,10 @@ def BuySell(buyvar, coppockD1, currency, funds, currentPrice, possibleIncome, in
     print(coppockD1[0]/abs(coppockD1[0]))
     print(coppockD1[1]/abs(coppockD1[1]))
     # Sell Conditions: latest derivative is - and previous is +
-    if buyvar == False and (coppockD1[0]/abs(coppockD1[0])) == -1 and (coppockD1[1]/abs(coppockD1[1])) == 1:
+    if buyvar == False and (coppockD1[0]/abs(coppockD1[0])) == -1 and (coppockD1[1]/abs(coppockD1[1])) == 1 and owned > 0.0:
 
         # Place the order
+        # It would be better if you placed a limit order rather than a normal order
         auth_client.place_market_order(product_id=currency,side='sell',size=str(owned))
 
         # Print message in the terminal for reference
@@ -142,7 +143,26 @@ def stats(currentPrice, funds, owned, currency, coppockres):
 
 # Main Loop
 while True:
-    # 4 loops for each currency
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    print("ids for currencies")
+    print(specificID)
+    print(specificID1)
+    print(specificID2)
+    print(specificID3)
+    #time.sleep(1)
+    print('\n')
+
+    # The amount of currency owned
+    owned = float(auth_client.get_account(specificID)['available'])
+    owned1 = float(auth_client.get_account(specificID1)['available'])
+    owned2 = float(auth_client.get_account(specificID2)['available'])
+    owned3 = float(auth_client.get_account(specificID3)['available'])
+
+    # This is where all the functions do all the math
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    print("Coppock function / BuySell stats")
+
+    # Calculate the rate of change 11 and 14 units back, then sum them
     try:
         historicData = auth_client.get_product_historic_rates(currency, granularity=period)
 
@@ -160,6 +180,17 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
+    possibleIncome = (float(currentPrice) * owned)
+    time.sleep(1)
+    CoppockFormula(price)
+    coppockres = CoppockFormula.variable
+    statscoppock = coppockres
+    print(currency)
+    print(coppockres)
+    BuySell(buy, coppockres, currency, funding, currentPrice, possibleIncome, funding, owned, funding)
+    funding = BuySell.variable
+    buy = buy_var
+
     try:
         historicData1 = auth_client.get_product_historic_rates(currency1, granularity=period)
 
@@ -177,6 +208,17 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
+    possibleIncome1 = (float(currentPrice1) * owned1)
+    time.sleep(1)
+    CoppockFormula(price1)
+    coppockres = CoppockFormula.variable
+    print(currency1)
+    print(coppockres)
+    statscoppock1 = coppockres
+    BuySell(buy1, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1, funding1)
+    buy1 = buy_var
+    funding1 = BuySell.variable
+
     try:
         historicData2 = auth_client.get_product_historic_rates(currency2, granularity=period)
 
@@ -194,6 +236,17 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
+    possibleIncome2 = (float(currentPrice2) * owned2)
+    time.sleep(1)
+    CoppockFormula(price2)
+    coppockres = CoppockFormula.variable
+    print(currency2)
+    print(coppockres)
+    statscoppock2 = coppockres
+    BuySell(buy2, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2, funding2)
+    buy2 = buy_var
+    funding2 = BuySell.variable
+
     try:
         historicData3 = auth_client.get_product_historic_rates(currency3, granularity=period)
 
@@ -211,65 +264,8 @@ while True:
         # In case something went wrong with cbpro
         print("Error Encountered")
         break
-    time.sleep(1)
-
-
-    
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    print("ids for currencies")
-    print(specificID)
-    print(specificID1)
-    print(specificID2)
-    print(specificID3)
-    #time.sleep(1)
-    print('\n')
-
-    # The amount of currency owned
-    owned = float(auth_client.get_account(specificID)['available'])
-    owned1 = float(auth_client.get_account(specificID1)['available'])
-    owned2 = float(auth_client.get_account(specificID2)['available'])
-    owned3 = float(auth_client.get_account(specificID3)['available'])
-
-
-    # The value of the cryptourrency in USD
-    possibleIncome = (float(currentPrice) * owned)
-    possibleIncome1 = (float(currentPrice1) * owned1)
-    possibleIncome2 = (float(currentPrice2) * owned2)
     possibleIncome3 = (float(currentPrice3) * owned3)
-
-    # This is where all the functions do all the math
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-    print("Coppock function / BuySell stats")
-
-    # Calculate the rate of change 11 and 14 units back, then sum them
-    CoppockFormula(price)
-    coppockres = CoppockFormula.variable
-    statscoppock = coppockres
-    print(currency)
-    print(coppockres)
-    BuySell(buy, coppockres, currency, funding, currentPrice, possibleIncome, funding, owned, funding)
-    funding = BuySell.variable
-    buy = buy_var
-
-    CoppockFormula(price1)
-    coppockres = CoppockFormula.variable
-    print(currency1)
-    print(coppockres)
-    statscoppock1 = coppockres
-    BuySell(buy1, coppockres, currency1, funding1, currentPrice1, possibleIncome1, funding1, owned1, funding1)
-    buy1 = buy_var
-    funding1 = BuySell.variable
-
-
-    CoppockFormula(price2)
-    coppockres = CoppockFormula.variable
-    print(currency2)
-    print(coppockres)
-    statscoppock2 = coppockres
-    BuySell(buy2, coppockres, currency2, funding2, currentPrice2, possibleIncome2, funding2, owned2, funding2)
-    buy2 = buy_var
-    funding2 = BuySell.variable
-
+    time.sleep(1)
     CoppockFormula(price3)
     coppockres = CoppockFormula.variable
     statscoppock3 = coppockres
@@ -296,6 +292,7 @@ while True:
     # Could make this a table and have an unlimited amount of variables to calculate :)
     print('Total invested in currencies: $' + str(abs(int(funding + funding1 + funding2 + funding3) - int(initInvestment))))
     print('Initial investment total: $' + str(initInvestment))
+    print(buy, buy1, buy2, buy3)
     # Wait for however long the period variable is before repeating
     time.sleep(period)
     iteration += 1
